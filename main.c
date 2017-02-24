@@ -20,5 +20,8 @@ typedef struct Player {
 } Player;
 
 int main(void) {
+	Player players[6];
+	Slot slots[20];
+
 	printf("Hello world!");
 }
