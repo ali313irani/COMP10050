@@ -21,6 +21,8 @@ typedef struct Player {
 	int dexterity;
 } Player;
 
+unsigned int rand_range(int max);
+
 int main(void) {
 	Player players[6];
 	Slot slots[20];
@@ -58,4 +60,23 @@ int main(void) {
 		
 	}
 	
+}
+
+/**
+ * @param max Maximum value of random integer.
+ * @return Random integer [0..max].
+ */
+unsigned int rand_range(int max) {
+	int r;
+	int range = max + 1;
+	int buckets = RAND_MAX / range;
+	int limit = buckets * range;
+
+	// Ensure fair spread of numbers by excluding some numbers in
+	// the upper range of rand() that would create a biased result
+	do {
+		r = rand();
+	} while (r >= limit);
+
+	return (unsigned int) (r / buckets);
 }
