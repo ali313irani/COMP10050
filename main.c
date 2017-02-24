@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <mem.h>
+#include <malloc.h>
 
 typedef enum Slot {
 	Ground, City, Hill
@@ -22,17 +24,17 @@ typedef struct Player {
 int main(void) {
 	Player players[6];
 	Slot slots[20];
-	int players_count;
+	int players_count = 0;
 	char t;
 	
 	printf("Welcome to CrossFire!!");
 	
-	while(players_count < 0){
+	while(players_count < 6){
 		Player p;
-		p.name = (char*) ,malloc(32 * sizeof(char));
-		printf("Player types: (E)lf, (H)uman, (O)gre, (W)izard\n\n");
+		p.name = (char*) malloc(32 * sizeof(char));
+		printf("\nPlayer types: (E)lf, (H)uman, (O)gre, (W)izard\n\n");
 		
-		printf("Enter player name: \nEnter player type: ");
+		printf("Enter type and Enter player name: ");
 		scanf("%c %s", &t, p.name);
 		
 		if(t == 'e'){
@@ -50,12 +52,10 @@ int main(void) {
 		else{
 			break;
 		}
-		players[count++] = p;
+		
+		printf("%s ", p.name);
+		players[players_count++] = p;
 		
 	}
 	
-	
-	
-	
-	printf("Hello world!");
 }
