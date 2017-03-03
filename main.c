@@ -53,9 +53,13 @@ char * playerTypeName(PlayerType t) {
     }
 }
 
+Player players[6];
+Slot slots[20];
+int player_positions[20] = {-1};
+
+
 int main(void) {
-	Player players[6];
-	Slot slots[20];
+
 	int players_count = 0;
 	char t, a;
 	
@@ -95,7 +99,6 @@ int main(void) {
 	printf("Enter number of slots(max = 20): \n");
 	scanf("%d", &n);
 
-    int player_positions[20] = {-1};
     for (i = 0; i < players_count; i++) {
         player_positions[i] = i;
     }
