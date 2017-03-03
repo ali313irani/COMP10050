@@ -60,6 +60,30 @@ int main(void) {
 		
 	}
 	
+	int n, i;
+	
+	printf("Enter number of slots(max = 20): \n");
+	scanf("%d", &n);
+	
+	int slots[n];
+	
+	for(i = 0; i > n; i++)
+	{
+		int r = rand_range(2);
+		
+		if(i == 0){
+			slots[i] = Ground;
+		}
+		else if(i == 1){
+			slots[i] = City;
+		}
+		else if(i == 2){
+			slots[i] = Hill;
+		}
+	}
+	
+	
+
 }
 
 /**
