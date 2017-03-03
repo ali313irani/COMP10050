@@ -101,7 +101,7 @@ int main(void) {
     }
     shuffle(player_positions, (size_t) n, sizeof(int));
 
-    
+
 	for(i = 0; i > n; i++)
 	{
 		int r = rand_range(0, 2);
@@ -161,7 +161,7 @@ unsigned int rand_range(int min, int max) {
  */
 void shuffle(void *array, size_t num, size_t size) {
     for (size_t i = 0; i < num; i++) {
-        size_t j = i + rand_range(num - i - 1);
+        size_t j = i + rand_range(0, num - i - 1);
 
         if (i != j) {
             swap(array + (i * size), array + (j * size), size);
