@@ -21,7 +21,7 @@ typedef struct Player {
 	int dexterity;
 } Player;
 
-unsigned int rand_range(int max);
+unsigned int rand_range(int min, int max);
 
 char * slotName(Slot s) {
     switch (s) {
@@ -93,8 +93,6 @@ int main(void) {
 	printf("Enter number of slots(max = 20): \n");
 	scanf("%d", &n);
 	
-	int slots[n];
-	
 	for(i = 0; i > n; i++)
 	{
 		int r = rand_range(2);
@@ -118,9 +116,9 @@ int main(void) {
  * @param max Maximum value of random integer.
  * @return Random integer [0..max].
  */
-unsigned int rand_range(int max) {
+unsigned int rand_range(int min, int max) {
 	int r;
-	int range = max + 1;
+	int range = (max - min) + 1;
 	int buckets = RAND_MAX / range;
 	int limit = buckets * range;
 
@@ -130,5 +128,5 @@ unsigned int rand_range(int max) {
 		r = rand();
 	} while (r >= limit);
 
-	return (unsigned int) (r / buckets);
+	return min + (unsigned int) (r / buckets);
 }
