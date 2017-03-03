@@ -174,10 +174,10 @@ int main(void) {
 		scanf("%c", &a);
 		
 		if(a == 'a'){
-			attack(i);
+			attack(players[i]);
 		}
 		else if(a == 'm'){
-			move(i);
+			move(player[i]);
 		}
 		
 	}
@@ -234,10 +234,10 @@ void shuffle(void *array, size_t num, size_t size) {
     }
 }
 
-void move(int position){
+void move(player p){
 	
 }
 
-void attack(int position){
+void attack(player p){
 	
 }
