@@ -13,6 +13,7 @@ typedef enum PlayerType {
 typedef struct Player {
 	char *name;
 	enum PlayerType type;
+    int slot;
 	int life;
 	int smartness;
 	int strength;
@@ -103,6 +104,11 @@ int main(void) {
         player_positions[i] = i;
     }
     shuffle(player_positions, (size_t) n, sizeof(int));
+    for (i = 0; i < n; i++) {
+        if (player_positions[i] >= 0) {
+            players[player_positions[i]].slot = i;
+        }
+    }
 
 
 	for(i = 0; i > n; i++)
