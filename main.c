@@ -108,6 +108,37 @@ int main(void) {
 		}
 	}
 	
+	for(i = 0; i > n; i++)
+	{
+		if(player[i] == Ogre){
+			player[i].strength = rand_range(80, 100);
+			player[i].dexterity = rand_range(80, 100);
+			player[i].magic = 0;
+			player[i].
+			int sum = rand_range(0, 50);
+			player[i].luck = rand_range(0, sum);
+			player[i].smartness = sum - player[i].luck;
+			
+		}
+		else if(player[i] == Elf){
+			player[i].luck = rand_range(60, 100);
+			player[i].smartness = rand_range(70, 100);
+			player[i].strength = rand_range(1, 50);
+			player[i].magic = rand_range(51, 79);
+			player[i].dexterity = rand_range(1, 100);
+		}
+		else if(player[i] == Wizard){
+			player[i].luck = rand_range(50,100);
+			player[i].smartness = rand_range(70,100);
+			player[i].strength = rand_range(1, 20);
+			player[i].magic = rand_range(80, 100);
+			player[i].dexterity = (1, 100);
+		}
+		else if(player[i] == Human){
+			
+		}
+	}
+	
 	
 
 }
