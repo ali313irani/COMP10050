@@ -178,7 +178,11 @@ int main(void) {
 			attack(players[i]);
 		}
 		else if(a == 'm'){
-			move(player[i]);
+			if(!move(players[i])){
+				printf("Player can't move so must attack.");
+				attack(players[i]);
+			}
+			
 		}
 		
 	}
@@ -235,10 +239,17 @@ void shuffle(void *array, size_t num, size_t size) {
     }
 }
 
-void move(player p){
+bool move(player p){
 	int slot = p.slot;
 	bool left_empty, right_empty;
-	if(player_positions[])
+	
+	left_empty = slot > 0 && player_positions[slot - 1] == -1;
+	right_empty = slot < slots_count - 1 &&  player_positions[slot + 1] == -1;
+	
+	if(!left_empty && !right_empty){
+		return false;
+	}
+	return true;
 }
 
 void attack(player p){
