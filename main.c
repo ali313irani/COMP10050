@@ -23,6 +23,34 @@ typedef struct Player {
 
 unsigned int rand_range(int max);
 
+char * slotName(Slot s) {
+    switch (s) {
+        case Ground:
+            return "Ground";
+        case City:
+            return "City";
+        case Hill:
+            return "Hill";
+        default:
+            return "";
+    }
+}
+
+char * playerTypeName(PlayerType t) {
+    switch (t) {
+        case Elf:
+            return "Elf";
+        case Human:
+            return "Human";
+        case Ogre:
+            return "Ogre";
+        case Wizard:
+            return "Wizard";
+        default:
+            return "";
+    }
+}
+
 int main(void) {
 	Player players[6];
 	Slot slots[20];
