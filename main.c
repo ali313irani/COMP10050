@@ -249,9 +249,38 @@ bool move(player p){
 	if(!left_empty && !right_empty){
 		return false;
 	}
+	
+	int direction = 0;
+	
+	if(left_empty && right_empty){
+		char d;
+		do{
+		printf("Would you like to go left or right?: ");
+		scanf("%c", &d);
+		}while(d != 'l' && d != 'r');
+		
+		if(d == 'l'){
+			direction = -1;
+		}
+		else if(d == 'r'){
+			direction = 1;
+		}
+			
+	}
+	else if(left_empty){
+			direction = -1;
+		}
+    else if(right_empty){
+			direction = 1;
+		}
+		player.slot += direction;
+		player_positions[player.slot] = player_positions[slot];
+		player_positions[slot] = -1;
+		
 	return true;
 }
 
 void attack(player p){
+	
 	
 }
