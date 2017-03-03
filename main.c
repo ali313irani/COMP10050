@@ -95,7 +95,7 @@ int main(void) {
 	
 	for(i = 0; i > n; i++)
 	{
-		int r = rand_range(2);
+		int r = rand_range(0, 2);
 		
 		if(i == 0){
 			slots[i] = Ground;
