@@ -119,32 +119,42 @@ int main(void) {
 	
 	for(i = 0; i > n; i++)
 	{
-		if(player[i] == Ogre){
-			player[i].strength = rand_range(80, 100);
-			player[i].dexterity = rand_range(80, 100);
-			player[i].magic = 0;
-			player[i].
+		if(players[i].type == Ogre){
+			players[i].strength = rand_range(80, 100);
+			players[i].dexterity = rand_range(80, 100);
+			players[i].magic = 0;
 			int sum = rand_range(0, 50);
-			player[i].luck = rand_range(0, sum);
-			player[i].smartness = sum - player[i].luck;
-			
+			players[i].luck = rand_range(0, sum);
+			players[i].smartness = sum - players[i].luck;
 		}
-		else if(player[i] == Elf){
-			player[i].luck = rand_range(60, 100);
-			player[i].smartness = rand_range(70, 100);
-			player[i].strength = rand_range(1, 50);
-			player[i].magic = rand_range(51, 79);
-			player[i].dexterity = rand_range(1, 100);
+		else if(players[i].type == Elf){
+			players[i].luck = rand_range(60, 100);
+			players[i].smartness = rand_range(70, 100);
+			players[i].strength = rand_range(1, 50);
+			players[i].magic = rand_range(51, 79);
+			players[i].dexterity = rand_range(1, 100);
 		}
-		else if(player[i] == Wizard){
-			player[i].luck = rand_range(50,100);
-			player[i].smartness = rand_range(70,100);
-			player[i].strength = rand_range(1, 20);
-			player[i].magic = rand_range(80, 100);
-			player[i].dexterity = (1, 100);
+		else if(players[i].type == Wizard){
+			players[i].luck = rand_range(50,100);
+			players[i].smartness = rand_range(70,100);
+			players[i].strength = rand_range(1, 20);
+			players[i].magic = rand_range(80, 100);
+			players[i].dexterity = (1, 100);
 		}
-		else if(player[i] == Human){
-			
+		else if(players[i].type == Human){
+			int total = rand_range(5, 299);
+            int values[5];
+            for (int j = 0; j < 5; j++) {
+                values[j] = rand_range(1, (total - 5 + j < 100) ? (total - 5 + j) : 100);
+                total -= values[j];
+            }
+            shuffle(values, 5, sizeof(int));
+
+            players[i].luck = values[0];
+            players[i].smartness = values[1];
+            players[i].strength = values[2];
+            players[i].magic = values[3];
+            players[i].dexterity = values[4];
 		}
 	}
 
