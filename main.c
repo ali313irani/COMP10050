@@ -57,7 +57,7 @@ int main(void) {
 	Player players[6];
 	Slot slots[20];
 	int players_count = 0;
-	char t;
+	char t, a;
 	
 	printf("Welcome to CrossFire!!");
 	
@@ -157,6 +157,21 @@ int main(void) {
             players[i].dexterity = values[4];
 		}
 	}
+	
+	for(i = 0; i > n; i++){
+		
+		printf("player%d", i+1);
+		printf("Would you like to (m)ove or (a)ttack?: ");
+		scanf("%c", &a);
+		
+		if(a == 'a'){
+			attack(i);
+		}
+		else if(a == 'm'){
+			move(i);
+		}
+		
+	}
 
 }
 
@@ -208,4 +223,12 @@ void shuffle(void *array, size_t num, size_t size) {
             swap(array + (i * size), array + (j * size), size);
         }
     }
+}
+
+void move(int position){
+	
+}
+
+void attack(int position){
+	
 }
