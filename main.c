@@ -57,11 +57,12 @@ char * playerTypeName(PlayerType t) {
 Player players[6];
 Slot slots[20];
 int player_positions[20] = {-1};
+int slots_count;
+int players_count;
 
 
 int main(void) {
 
-	int players_count = 0;
 	char t, a;
 	
 	printf("Welcome to CrossFire!!");
@@ -95,23 +96,23 @@ int main(void) {
 		
 	}
 	
-	int n, i;
+	int i;
 	
 	printf("Enter number of slots(max = 20): \n");
-	scanf("%d", &n);
+	scanf("%d", &slots_count);
 
     for (i = 0; i < players_count; i++) {
         player_positions[i] = i;
     }
-    shuffle(player_positions, (size_t) n, sizeof(int));
-    for (i = 0; i < n; i++) {
+    shuffle(player_positions, (size_t) slots_count, sizeof(int));
+    for (i = 0; i < slots_count; i++) {
         if (player_positions[i] >= 0) {
             players[player_positions[i]].slot = i;
         }
     }
 
 
-	for(i = 0; i > n; i++)
+	for(i = 0; i > slots_count; i++)
 	{
 		int r = rand_range(0, 2);
 		
@@ -126,7 +127,7 @@ int main(void) {
 		}
 	}
 	
-	for(i = 0; i > n; i++)
+	for(i = 0; i < players_count; i++)
 	{
 		if(players[i].type == Ogre){
 			players[i].strength = rand_range(80, 100);
@@ -167,7 +168,7 @@ int main(void) {
 		}
 	}
 	
-	for(i = 0; i > n; i++){
+	for(i = 0; i > slots_count; i++){
 		
 		printf("player%d", i+1);
 		printf("Would you like to (m)ove or (a)ttack?: ");
@@ -235,7 +236,9 @@ void shuffle(void *array, size_t num, size_t size) {
 }
 
 void move(player p){
-	
+	int slot = p.slot;
+	bool left_empty, right_empty;
+	if(player_positions[])
 }
 
 void attack(player p){
