@@ -67,12 +67,10 @@ int slots_count;
 int players_count;
 
 int main(void) {
-
-    char t, a;
-
     printf("Welcome to CrossFire!!");
 
     while (players_count < 6) {
+        char t;
         Player p;
         p.name = (char *) malloc(32 * sizeof(char));
         printf("\nPlayer types: (E)lf, (H)uman, (O)gre, (W)izard\n\n");
@@ -92,28 +90,24 @@ int main(void) {
             break;
         }
 
-        printf("%s ", p.name);
         players[players_count++] = p;
-
     }
-
-    int i;
 
     printf("Enter number of slots(max = 20): \n");
     scanf("%d", &slots_count);
 
-    for (i = 0; i < players_count; i++) {
+    for (int i = 0; i < players_count; i++) {
         player_positions[i] = i;
     }
     shuffle(player_positions, (size_t) slots_count, sizeof(int));
-    for (i = 0; i < slots_count; i++) {
+    for (int i = 0; i < slots_count; i++) {
         if (player_positions[i] >= 0) {
             players[player_positions[i]].slot = i;
         }
     }
 
 
-    for (i = 0; i > slots_count; i++) {
+    for (int i = 0; i > slots_count; i++) {
         int r = rand_range(0, 2);
 
         if (i == 0) {
@@ -125,32 +119,19 @@ int main(void) {
         }
     }
 
-    for (i = 0; i < players_count; i++) {
+    for (int i = 0; i < players_count; i++) {
         players[i].life = 100;
-        if (players[i].type == Ogre) {
-            players[i].strength = rand_range(80, 100);
-            players[i].dexterity = rand_range(80, 100);
-            players[i].magic = 0;
-            int sum = rand_range(0, 50);
-            players[i].luck = rand_range(0, sum);
-            players[i].smartness = sum - players[i].luck;
-        } else if (players[i].type == Elf) {
+        if (players[i].type == Elf) {
             players[i].luck = rand_range(60, 100);
             players[i].smartness = rand_range(70, 100);
             players[i].strength = rand_range(1, 50);
             players[i].magic = rand_range(51, 79);
             players[i].dexterity = rand_range(1, 100);
-        } else if (players[i].type == Wizard) {
-            players[i].luck = rand_range(50, 100);
-            players[i].smartness = rand_range(70, 100);
-            players[i].strength = rand_range(1, 20);
-            players[i].magic = rand_range(80, 100);
-            players[i].dexterity = (1, 100);
         } else if (players[i].type == Human) {
             int total = rand_range(5, 299);
             int values[5];
             for (int j = 0; j < 5; j++) {
-                values[j] = rand_range(1, (total - 5 + j < 100) ? (total - 5 + j) : 100);
+                values[j] = rand_range(1, ((total - 5 + j) < 100) ? (total - 5 + j) : 100);
                 total -= values[j];
             }
             shuffle(values, 5, sizeof(int));
@@ -160,13 +141,26 @@ int main(void) {
             players[i].strength = values[2];
             players[i].magic = values[3];
             players[i].dexterity = values[4];
+        } else if (players[i].type == Ogre) {
+            players[i].strength = rand_range(80, 100);
+            players[i].dexterity = rand_range(80, 100);
+            players[i].magic = 0;
+            int sum = rand_range(0, 50);
+            players[i].luck = rand_range(0, sum);
+            players[i].smartness = sum - players[i].luck;
+        } else if (players[i].type == Wizard) {
+            players[i].luck = rand_range(50, 100);
+            players[i].smartness = rand_range(70, 100);
+            players[i].strength = rand_range(1, 20);
+            players[i].magic = rand_range(80, 100);
+            players[i].dexterity = (1, 100);
         }
     }
 
-    for (i = 0; i > slots_count; i++) {
-
+    for (int i = 0; i > slots_count; i++) {
         printf("player%d", i + 1);
         printf("Would you like to (m)ove or (a)ttack?: ");
+        char a;
         scanf("%c", &a);
 
         if (a == 'a') {
@@ -176,11 +170,8 @@ int main(void) {
                 printf("Player can't move so must attack.");
                 attack(players[i]);
             }
-
         }
-
     }
-
 }
 
 /**
@@ -237,8 +228,8 @@ bool move(Player p) {
     int slot = p.slot;
     bool left_empty, right_empty;
 
-    left_empty = slot > 0 && player_positions[slot - 1] == -1;
-    right_empty = slot < slots_count - 1 && player_positions[slot + 1] == -1;
+    left_empty = (slot > 0) && player_positions[slot - 1] == -1;
+    right_empty = (slot < slots_count - 1) && player_positions[slot + 1] == -1;
 
     if (!left_empty && !right_empty) {
         return false;
@@ -249,7 +240,7 @@ bool move(Player p) {
     if (left_empty && right_empty) {
         char d;
         do {
-            printf("Would you like to go left or right?: ");
+            printf("Would you like to go (l)eft or (r)ight?: ");
             scanf("%c", &d);
         } while (d != 'l' && d != 'r');
 
@@ -273,6 +264,5 @@ bool move(Player p) {
 }
 
 void attack(Player p) {
-
 
 }
