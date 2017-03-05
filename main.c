@@ -35,7 +35,7 @@ unsigned int rand_range(int min, int max);
 void shuffle(void *array, size_t num, size_t size);
 
 bool move(Player p);
-void attack(Player p);
+bool attack(Player p);
 
 char *slotTypeName(SlotType s) {
     switch (s) {
@@ -238,7 +238,7 @@ void shuffle(void *array, size_t num, size_t size) {
 
 bool move(Player p) {
     int slot = p.slot;
-    
+
     bool left_empty = (slot > 0) && slots[slot - 1].player == -1;
     bool right_empty = (slot < slots_count - 1) && slots[slot + 1].player == -1;
 
@@ -247,7 +247,6 @@ bool move(Player p) {
     }
 
     int direction = 0;
-
     if (left_empty && right_empty) {
         char d;
         do {
@@ -274,6 +273,48 @@ bool move(Player p) {
     return true;
 }
 
-void attack(Player p) {
+bool attack(Player p) {
+    int left_player = -1, right_player = -1;
 
+    for (int dist = 1; p.slot - dist > 0 || p.slot + dist < slots_count; dist++) {
+        if (p.slot - dist > 0 && slots[p.slot - dist].player != -1) {
+            left_player = slots[p.slot - dist].player;
+        }
+        if (p.slot + dist < slots_count && slots[p.slot + dist].player != -1) {
+            right_player = slots[p.slot + dist].player;
+        }
+
+        if (left_player != -1 || right_player != -1) {
+            break;
+        }
+    }
+
+    Player attack_player;
+    if (left_player != -1 && right_player != -1) {
+        char d;
+        do {
+            printf("Would you like to attack (l)eft or (r)ight?: ");
+            scanf("%c", &d);
+        } while (d != 'l' && d != 'r');
+
+        if (d == 'l') {
+            attack_player = players[left_player];
+        } else if (d == 'r') {
+            attack_player = players[right_player];
+        }
+    } else if (left_player != -1) {
+        attack_player = players[left_player];
+    } else if (right_player != -1) {
+        attack_player = players[right_player];
+    } else {
+        return false;
+    }
+
+    if (p.strength <= 70) {
+        attack_player.life -= 0.5 * attack_player.strength;
+    } else {
+        attack_player.life -= 0.3 * attack_player.strength;
+    }
+
+    return true;
 }
