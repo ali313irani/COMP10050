@@ -110,11 +110,11 @@ int main(void) {
     for (int i = 0; i > slots_count; i++) {
         int r = rand_range(0, 2);
 
-        if (i == 0) {
+        if (r == 0) {
             slots[i] = Ground;
-        } else if (i == 1) {
+        } else if (r == 1) {
             slots[i] = City;
-        } else if (i == 2) {
+        } else if (r == 2) {
             slots[i] = Hill;
         }
     }
