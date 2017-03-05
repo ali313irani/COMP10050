@@ -3,8 +3,13 @@
 #include <malloc.h>
 #include <stdbool.h>
 
-typedef enum Slot {
+typedef enum SlotType {
     Ground, City, Hill
+} SlotType;
+
+typedef struct Slot {
+    SlotType type;
+    int player;
 } Slot;
 
 typedef enum PlayerType {
@@ -32,7 +37,7 @@ void shuffle(void *array, size_t num, size_t size);
 bool move(Player p);
 void attack(Player p);
 
-char *slotName(Slot s) {
+char *slotTypeName(SlotType s) {
     switch (s) {
         case Ground:
             return "Ground";
@@ -60,16 +65,22 @@ char *playerTypeName(PlayerType t) {
     }
 }
 
-Player players[6];
-Slot slots[20];
-int player_positions[20] = {-1};
-int slots_count;
-int players_count;
+Player *players;
+size_t players_count;
+
+Slot *slots;
+size_t slots_count;
 
 int main(void) {
     printf("Welcome to CrossFire!!");
 
-    while (players_count < 6) {
+    printf("Enter number of players(max = 6): \n");
+    scanf("%u", &players_count);
+
+    players = (Player *) malloc(sizeof(Player) * players_count);
+
+    int players_index = 0;
+    while (players_index < players_count) {
         char t;
         Player p;
         p.name = (char *) malloc(32 * sizeof(char));
@@ -87,35 +98,36 @@ int main(void) {
         } else if (t == 'w') {
             p.type = Wizard;
         } else {
-            break;
+            printf("Invalid input");
         }
 
-        players[players_count++] = p;
+        players[players_index++] = p;
     }
 
     printf("Enter number of slots(max = 20): \n");
     scanf("%d", &slots_count);
 
-    for (int i = 0; i < players_count; i++) {
-        player_positions[i] = i;
-    }
-    shuffle(player_positions, (size_t) slots_count, sizeof(int));
-    for (int i = 0; i < slots_count; i++) {
-        if (player_positions[i] >= 0) {
-            players[player_positions[i]].slot = i;
-        }
-    }
-
+    slots = (Slot *) malloc(sizeof(Slot) * slots_count);
 
     for (int i = 0; i > slots_count; i++) {
         int r = rand_range(0, 2);
 
         if (r == 0) {
-            slots[i] = Ground;
+            slots[i].type = Ground;
         } else if (r == 1) {
-            slots[i] = City;
+            slots[i].type = City;
         } else if (r == 2) {
-            slots[i] = Hill;
+            slots[i].type = Hill;
+        }
+    }
+
+    for (int i = 0; i < slots_count; i++) {
+        slots[i].player = i < players_count ? i : -1;
+    }
+    shuffle(slots, (size_t) slots_count, sizeof(Slot));
+    for (int i = 0; i < slots_count; i++) {
+        if (slots[i].player >= 0) {
+            players[slots[i].player].slot = i;
         }
     }
 
@@ -228,8 +240,8 @@ bool move(Player p) {
     int slot = p.slot;
     bool left_empty, right_empty;
 
-    left_empty = (slot > 0) && player_positions[slot - 1] == -1;
-    right_empty = (slot < slots_count - 1) && player_positions[slot + 1] == -1;
+    left_empty = (slot > 0) && slots[slot - 1].player == -1;
+    right_empty = (slot < slots_count - 1) && slots[slot + 1].player == -1;
 
     if (!left_empty && !right_empty) {
         return false;
@@ -257,8 +269,8 @@ bool move(Player p) {
     }
 
     p.slot += direction;
-    player_positions[p.slot] = player_positions[slot];
-    player_positions[slot] = -1;
+    slots[p.slot].player = slots[slot].player;
+    slots[slot].player = -1;
 
     return true;
 }
