@@ -238,10 +238,9 @@ void shuffle(void *array, size_t num, size_t size) {
 
 bool move(Player p) {
     int slot = p.slot;
-    bool left_empty, right_empty;
-
-    left_empty = (slot > 0) && slots[slot - 1].player == -1;
-    right_empty = (slot < slots_count - 1) && slots[slot + 1].player == -1;
+    
+    bool left_empty = (slot > 0) && slots[slot - 1].player == -1;
+    bool right_empty = (slot < slots_count - 1) && slots[slot + 1].player == -1;
 
     if (!left_empty && !right_empty) {
         return false;
