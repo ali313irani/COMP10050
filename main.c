@@ -99,8 +99,15 @@ size_t slots_count;
 int main(void) {
     srand((unsigned int) time(NULL));
 
-    printf("Welcome to CrossFire!!\n");
+    printf("Welcome to:\n"
+            "   _____                   ______ _          \n"
+            "  / ____|                 |  ____(_)         \n"
+            " | |     _ __ ___  ___ ___| |__   _ _ __ ___ \n"
+            " | |    | '__/ _ \\/ __/ __|  __| | | '__/ _ \\\n"
+            " | |____| | | (_) \\__ \\__ \\ |    | | | |  __/\n"
+            "  \\_____|_|  \\___/|___/___/_|    |_|_|  \\___|\n\n");
 
+    // Command prompt must be in utf-8 mode
     system("chcp 65001");
 
     // Demo mode fills in a default set of players
