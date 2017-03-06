@@ -38,7 +38,7 @@ unsigned int rand_range(int min, int max);
 void shuffle(void *array, size_t num, size_t size);
 
 int move(Player *p);
-bool attack(Player *p);
+void attack(Player *p);
 
 void print_slots(int position, int direction_movement_from);
 
@@ -94,12 +94,14 @@ size_t players_count;
 size_t players_alive;
 
 Slot *slots;
-size_t slots_count = 20;
+size_t slots_count;
 
 int main(void) {
     srand((unsigned int) time(NULL));
 
     printf("Welcome to CrossFire!!\n");
+
+    system("chcp 65001");
 
     // Demo mode fills in a default set of players
     bool demo_mode;
@@ -521,21 +523,33 @@ int move(Player *p) {
     return direction;
 }
 
-bool attack(Player *p) {
+/**
+ * attack player
+ *
+ * @param p Pointer to player struct
+ * @return Direction moved, or 0 if unable to move
+ */
+void attack(Player *p) {
     int left_player = -1, right_player = -1;
 
+    // Find closest players to attack by increasing distance left/right to search until found
     for (int dist = 1; p->slot - dist > 0 || p->slot + dist < slots_count; dist++) {
+        // If not out of bounds and there is a player to the left at dist, left player is found
         if (p->slot - dist > 0 && slots[p->slot - dist].player != -1) {
             left_player = slots[p->slot - dist].player;
         }
+        // If not out of bounds and there is a player to the right at dist, right player is found
         if (p->slot + dist < slots_count && slots[p->slot + dist].player != -1) {
             right_player = slots[p->slot + dist].player;
         }
 
+        // If a player was found, finish looping
         if (left_player != -1 || right_player != -1) {
             break;
         }
     }
+
+
 
     Player *attack_player;
     if (left_player != -1 && right_player != -1) {
@@ -552,18 +566,22 @@ bool attack(Player *p) {
         }
     } else if (left_player != -1) {
         attack_player = &players[left_player];
-    } else { //if (right_player != -1) {
+    } else if (right_player != -1) {
         attack_player = &players[right_player];
+    } else {
+        // Shouldn't happen that no player was found, but return anyway to avoid error
+        return;
     }
 
+    // Attack player
     printf("Attacking %s\n", playerPrintName((*attack_player)));
-
     if (attack_player->strength <= 70) {
         attack_player->life -= 0.5 * attack_player->strength;
     } else {
         attack_player->life -= 0.3 * attack_player->strength;
     }
 
+    // If player has lost all health they are no longer alive
     if (attack_player->life <= 0) {
         attack_player->life = 0;
         attack_player->alive = false;
@@ -573,8 +591,6 @@ bool attack(Player *p) {
         players_alive--;
         printf("%s killed - RIP\n", playerPrintName((*attack_player)));
     }
-
-    return true;
 }
 
 /**
