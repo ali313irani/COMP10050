@@ -101,36 +101,43 @@ int main(void) {
 
     printf("Welcome to CrossFire!!\n");
 
+    // Demo mode fills in a default set of players
     bool demo_mode;
     char d;
     do {
         printf("Would you like to use (d)emo mode or (r)egular mode?:\n");
         scanf(" %c", &d);
     } while (d != 'd' && d != 'r');
-
     demo_mode = d == 'd';
 
     if (!demo_mode) {
-        printf("Enter number of players(max = 6):\n");
-        scanf("%u", &players_count);
+        do {
+            printf("Enter number of players [2..6]:\n");
+            scanf("%u", &players_count);
+        } while (players_count < 2 || players_count > 6);
     } else {
         players_count = 4;
     }
 
+    // Allocate players array
     players = (Player *) malloc(sizeof(Player) * players_count);
 
-
     if (!demo_mode) {
+        // Print list of possible player types
         printf("Player types: (e)lf, (h)uman, (o)gre, (w)izard\n");
+
+        // Index at which to insert next player
         int players_index = 0;
         while (players_index < players_count) {
-            char *name = (char *) malloc(32 * sizeof(char));
+            // Allocate memory for storing player name
+            char *name = (char *) malloc(64 * sizeof(char));
+            PlayerType type;
+
             char t;
             printf("Enter type and player name:\n");
             scanf(" %c %[^\n]", &t, name);
 
-            PlayerType type;
-
+            // Convert character to player type
             if (t == 'e') {
                 type = Elf;
             } else if (t == 'h') {
@@ -141,16 +148,20 @@ int main(void) {
                 type = Wizard;
             } else {
                 printf("Invalid type.\n");
+                // If invalid player type is given repeat the loop
                 continue;
             }
 
+            // Store player information in struct
             Player p;
             p.type = type;
             p.name = name;
 
+            // Add player to players array
             players[players_index++] = p;
         }
     } else {
+        // Default names and types
         char *demo_names[] = {"John Sheekey", "Mark Dukes", "Henry McLoughlin", "Liliana Pasquale"};
         PlayerType demo_types[] = {Human, Ogre, Wizard, Elf};
 
@@ -163,9 +174,13 @@ int main(void) {
         }
     }
 
+    // Fill in initial skill points
     for (int i = 0; i < players_count; i++) {
+        // Players start alive at 100 health
         players[i].alive = true;
         players[i].life = 100;
+
+        // Different player types have different starting skill points
         if (players[i].type == Elf) {
             players[i].luck = rand_range(60, 100);
             players[i].smartness = rand_range(70, 100);
@@ -173,12 +188,22 @@ int main(void) {
             players[i].magic = rand_range(51, 79);
             players[i].dexterity = rand_range(1, 100);
         } else if (players[i].type == Human) {
+            // Total skill points must be less than 300, and individual skill points must be > 0
+            // Therefore the range of the total values is 5..299
+            // Select a random value for total
             int total = rand_range(5, 299);
+
+            // Choose 5 random values, and subtract from the remaining total points each time
+            // Values are between 1 and 100 or the remaining total whichever is smaller
+            // If the total is smaller, a point is reserved for each remaining skill
             int values[5];
             for (int j = 0; j < 5; j++) {
                 values[j] = rand_range(1, ((total - 5 + j) < 100) ? (total - 5 + j) : 100);
                 total -= values[j];
             }
+
+            // Once 5 random equally distributed values have been chosen, shuffle them and
+            // insert into each of the 5 skill categories.
             shuffle(values, 5, sizeof(int));
 
             players[i].luck = values[0];
@@ -190,6 +215,8 @@ int main(void) {
             players[i].strength = rand_range(80, 100);
             players[i].dexterity = rand_range(80, 100);
             players[i].magic = 0;
+            // Choose total of luck and smartness first
+            // Then insert luck, and assign remaining total to smartness
             int sum = rand_range(0, 50);
             players[i].luck = rand_range(0, sum);
             players[i].smartness = sum - players[i].luck;
@@ -209,8 +236,10 @@ int main(void) {
         slots_count = 12;
     }
 
+    // Allocate slots array
     slots = (Slot *) malloc(sizeof(Slot) * slots_count);
 
+    // Assign random slot types
     for (int i = 0; i < slots_count; i++) {
         int r = rand_range(0, 2);
 
@@ -223,61 +252,74 @@ int main(void) {
         }
     }
 
+    // Distribute players randomly among slots by first inserting them
+    // at slot positions [0..players_count] and then shuffling the slots
     for (int i = 0; i < slots_count; i++) {
         slots[i].player = i < players_count ? i : -1;
     }
     shuffle(slots, (size_t) slots_count, sizeof(Slot));
+
+    // Once slots have been shuffled, update players with their current slot
     for (int i = 0; i < slots_count; i++) {
         if (slots[i].player >= 0) {
             players[slots[i].player].slot = i;
         }
     }
 
+    // At the beginning, all players are alive
     players_alive = players_count;
 
+    // Continue main program loop as long as there is more than 1 player alive
     int round = 1;
     while (players_alive > 1) {
         printf("╔══════════╗\n");
         printf("║ Round %2d ║\n", round);
         printf("╚══════════╝\n");
+
+        // Loop through each player
         for (int i = 0; i < players_count; i++) {
             Player p = players[i];
+
+            // If player is not alive continue to next player
             if (!p.alive) continue;
 
+            // Print player name in rounded box
             char *print_name = playerPrintName(p);
             int print_length = strlen("| Player 0 -  │") + strlen(print_name);
-
             printf("╭"); for (int x = 0; x < print_length - 4; x++) printf("─"); printf("╮\n");
             printf("│ Player %d - %s │\n", i + 1, print_name);
             printf("╰"); for (int x = 0; x < print_length - 4; x++) printf("─"); printf("╯\n");
 
+            // Print current slots
             print_slots(players[i].slot, 0);
 
             char a;
-            printf("Would you like to (m)ove or (a)ttack?:\n");
-            scanf(" %c", &a);
+            do {
+                printf("Would you like to (m)ove or (a)ttack?:\n");
+                scanf(" %c", &a);
+            } while (a != 'a' && a != 'm');
 
+            int m = 0;
             if (a == 'a') {
                 attack(players[i]);
+            } else { // if (a == 'm') {
+                m = move(&players[i]);
 
-                print_slots(players[i].slot, 0);
-            } else if (a == 'm') {
-                int m = move(&players[i]);
+                // If the player was unable to move, force attack
                 if (m == 0) {
                     printf("Player can't move so must attack.\n");
                     attack(players[i]);
-
-                    print_slots(players[i].slot, 0);
-                } else {
-                    print_slots(players[i].slot, m);
                 }
             }
+
+            // Print new slots
+            print_slots(players[i].slot, m);
 
             printf("\n\n");
         }
 
+        // End of round standings
         printf("End of round %d\n", round);
-
         for (int i = 0; i < players_count; i++) {
             printf("%s\n", playerPrintName(players[i]));
         }
@@ -285,6 +327,9 @@ int main(void) {
         printf("Press enter to continue...\n");
         fflush(stdin);
         while(getchar() != '\n');
+
+        // Clear screen for next round
+        system("cls");
 
         round++;
     }
@@ -454,7 +499,7 @@ bool attack(Player p) {
 
     printf("Attacking %s\n", playerPrintName((*attack_player)));
 
-    if (p.strength <= 70) {
+    if ((*attack_player).strength <= 70) {
         (*attack_player).life -= 0.5 * (*attack_player).strength;
     } else {
         (*attack_player).life -= 0.3 * (*attack_player).strength;
