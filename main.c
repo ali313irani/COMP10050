@@ -335,22 +335,39 @@ int main(void) {
     }
 }
 
+/**
+ * Prints the current slot standings
+ *
+ * @param position Slot position to highlight with thicker outline
+ * @param direction_movement_to Direction to which player at position has moved, indicated with a small arrow
+ */
 void print_slots(int position, int direction_movement_to) {
-    // Row 1
+    /*
+     * Row 1
+     */
+
+    // Top left corner
     printf(position != 0 ? "┌" : "┏");
+
+    // Loop through slots
     for (int i = 0; i < slots_count; i++) {
+        // Slot contains a player
         if (slots[i].player != -1) {
             Player p = players[slots[i].player];
 
             char *player_print_name = playerPrintName(p);
             int player_name_length = strlen(player_print_name);
 
+            // Account for the fact that player name will be printed on row 2 by printing more horizontal lines
             for (int j = 0; j < player_name_length + 2; j++) {
                 printf("%s", position != i ? "─" : "━");
             }
         } else {
+            // No player, print a single horizontal line
             printf("%s", position != i ? "─" : "━");
         }
+
+        // Vertical separator unless on last slot
         if (i < (slots_count - 1)) {
             if (position == i) {
                 printf("┱");
@@ -361,37 +378,60 @@ void print_slots(int position, int direction_movement_to) {
             }
         }
     }
+
+    // Top right corner
     printf(position != slots_count - 1 ? "┐" : "┓");
 
     printf("\n");
 
-    // Row 2
+    /*
+     * Row 2
+     */
+
+    // Middle left
     printf(position != 0 ? "│" : "┃");
+
+    // Loop through slots
     for (int i = 0; i < slots_count; i++) {
+        // Slot contains a player
         if (slots[i].player != -1) {
             Player p = players[slots[i].player];
+
             printf(" %s ", playerPrintName(p));
         } else {
+            // If player at adjacent position just moved from this slot, print arrow
             if (i == position - direction_movement_to) {
                 printf(direction_movement_to == -1 ? "←" : "→");
             } else {
                 printf(" ");
             }
         }
+
+        // Vertical separator unless on last slot
         if (i < (slots_count - 1)) {
             printf(position == i || position == i + 1 ? "┃" : "│");
         }
     }
+
+    // Middle right
     printf(position != slots_count - 1 ? "│" : "┃");
 
     printf("\n");
 
-    // Row 3
+    /*
+     * Row 3
+     */
+
+    // Bottom left corner
     printf(position != 0 ? "└" : "┗");
+
+    // Loop through slots
     for (int i = 0; i < slots_count; i++) {
+        // Slot contains a player
         if (slots[i].player != -1) {
             Player p = players[slots[i].player];
 
+            // Calculations for space filling horizontal lines
             char *player_print_name = playerPrintName(p);
             char *slot_type_name = slotTypeName(slots[i].type);
 
@@ -400,16 +440,24 @@ void print_slots(int position, int direction_movement_to) {
 
             int free_space = player_name_length - slot_type_name_length;
 
+            // Horizontal lines
             for (int j = 0; j < free_space / 2 + 1; j++) {
                 printf("%s", position != i ? "─" : "━");
             }
+
+            // Slot type
             printf("%s", slotTypeName(slots[i].type));
+
+            // Horizontal lines, (+0.5 in case of dividing odd number where int would be truncated down)
             for (int j = 0; j < (int)((float)free_space / 2 + 0.5) + 1; j++) {
                 printf("%s", position != i ? "─" : "━");
             }
         } else {
+            // Short slot type
             printf("%s", slotTypeLetter(slots[i].type));
         }
+
+        // Vertical separator unless on last slot
         if (i < (slots_count - 1)) {
             if (position == i) {
                 printf("┹");
@@ -420,6 +468,8 @@ void print_slots(int position, int direction_movement_to) {
             }
         }
     }
+
+    // Bottom right corner
     printf(position != slots_count - 1 ? "┘" : "┛");
 
     printf("\n");
