@@ -2,6 +2,8 @@
 #include <mem.h>
 #include <malloc.h>
 #include <stdbool.h>
+#include <time.h>
+#include <windows.h>
 
 typedef enum SlotType {
     Ground, City, Hill
@@ -20,6 +22,7 @@ typedef struct Player {
     char *name;
     enum PlayerType type;
     int slot;
+    bool alive;
     int life;
     int smartness;
     int strength;
@@ -34,8 +37,10 @@ unsigned int rand_range(int min, int max);
 
 void shuffle(void *array, size_t num, size_t size);
 
-bool move(Player p);
+int move(Player *p);
 bool attack(Player p);
+
+void print_slots(int position, int direction_movement_from);
 
 char *slotTypeName(SlotType s) {
     switch (s) {
@@ -45,6 +50,19 @@ char *slotTypeName(SlotType s) {
             return "City";
         case Hill:
             return "Hill";
+        default:
+            return "";
+    }
+}
+
+char *slotTypeLetter(SlotType s) {
+    switch (s) {
+        case Ground:
+            return "G";
+        case City:
+            return "C";
+        case Hill:
+            return "H";
         default:
             return "";
     }
@@ -65,73 +83,68 @@ char *playerTypeName(PlayerType t) {
     }
 }
 
+char *playerPrintName(Player p) {
+    char *printName = (char *) malloc(64 * sizeof(char));
+    sprintf(printName, "%s (%s) [%dHP]", p.name, playerTypeName(p.type), p.life);
+    return printName;
+}
+
 Player *players;
 size_t players_count;
+size_t players_alive;
 
 Slot *slots;
-size_t slots_count;
+size_t slots_count = 20;
 
 int main(void) {
-    printf("Welcome to CrossFire!!");
+    srand(time(NULL));
 
-    printf("Enter number of players(max = 6): \n");
-    scanf("%u", &players_count);
+    printf("Welcome to CrossFire!!\n");
+
+    printf("Enter number of players(max = 6):\n");
+    //scanf("%u", &players_count);
+    players_count = 4;
 
     players = (Player *) malloc(sizeof(Player) * players_count);
 
+    printf("Player types: (E)lf, (H)uman, (O)gre, (W)izard\n");
+
+    char *names[] = {"John Sheekey", "Mark Dukes", "Henry McLoughlin", "Liliana Pasquale"};
+    char types[] = {'h', 'o', 'w', 'e'};
+
     int players_index = 0;
     while (players_index < players_count) {
+        char *name = (char *) malloc(32 * sizeof(char));
         char t;
-        Player p;
-        p.name = (char *) malloc(32 * sizeof(char));
-        printf("\nPlayer types: (E)lf, (H)uman, (O)gre, (W)izard\n\n");
+        printf("Enter type and player name:\n");
+        //scanf(" %c %[^\n]", &t, name);
+        t = types[players_index];
+        name = names[players_index];
 
-        printf("Enter type and Enter player name: ");
-        scanf("%c %s", &t, p.name);
+        PlayerType type;
 
         if (t == 'e') {
-            p.type = Elf;
+            type = Elf;
         } else if (t == 'h') {
-            p.type = Human;
+            type = Human;
         } else if (t == 'o') {
-            p.type = Ogre;
+            type = Ogre;
         } else if (t == 'w') {
-            p.type = Wizard;
+            type = Wizard;
         } else {
-            printf("Invalid input");
+            printf("Invalid type.\n");
+            continue;
         }
+
+        Player p;
+        p.type = type;
+        p.name = name;
 
         players[players_index++] = p;
     }
 
-    printf("Enter number of slots(max = 20): \n");
-    scanf("%d", &slots_count);
-
-    slots = (Slot *) malloc(sizeof(Slot) * slots_count);
-
-    for (int i = 0; i > slots_count; i++) {
-        int r = rand_range(0, 2);
-
-        if (r == 0) {
-            slots[i].type = Ground;
-        } else if (r == 1) {
-            slots[i].type = City;
-        } else if (r == 2) {
-            slots[i].type = Hill;
-        }
-    }
-
-    for (int i = 0; i < slots_count; i++) {
-        slots[i].player = i < players_count ? i : -1;
-    }
-    shuffle(slots, (size_t) slots_count, sizeof(Slot));
-    for (int i = 0; i < slots_count; i++) {
-        if (slots[i].player >= 0) {
-            players[slots[i].player].slot = i;
-        }
-    }
-
     for (int i = 0; i < players_count; i++) {
+        players[i].alive = true;
         players[i].life = 100;
         if (players[i].type == Elf) {
             players[i].luck = rand_range(60, 100);
@@ -169,21 +182,271 @@ int main(void) {
         }
     }
 
-    for (int i = 0; i > slots_count; i++) {
-        printf("player%d", i + 1);
-        printf("Would you like to (m)ove or (a)ttack?: ");
-        char a;
-        scanf("%c", &a);
+    printf("Enter number of slots(max = 20): \n");
+    //scanf("%d", &slots_count);
 
-        if (a == 'a') {
-            attack(players[i]);
-        } else if (a == 'm') {
-            if (!move(players[i])) {
-                printf("Player can't move so must attack.");
+    slots = (Slot *) malloc(sizeof(Slot) * slots_count);
+
+    for (int i = 0; i < slots_count; i++) {
+        int r = rand_range(0, 2);
+
+        if (r == 0) {
+            slots[i].type = Ground;
+        } else if (r == 1) {
+            slots[i].type = City;
+        } else if (r == 2) {
+            slots[i].type = Hill;
+        }
+    }
+
+    for (int i = 0; i < slots_count; i++) {
+        slots[i].player = i < players_count ? i : -1;
+    }
+    shuffle(slots, (size_t) slots_count, sizeof(Slot));
+    for (int i = 0; i < slots_count; i++) {
+        if (slots[i].player >= 0) {
+            players[slots[i].player].slot = i;
+        }
+    }
+
+    players_alive = players_count;
+
+    int round = 1;
+    while (players_alive > 1) {
+        printf("╔══════════╗\n");
+        printf("║ Round %2d ║\n", round);
+        printf("╚══════════╝\n");
+        for (int i = 0; i < players_count; i++) {
+            Player p = players[i];
+            if (!p.alive) continue;
+
+            char *print_name = playerPrintName(p);
+            int print_length = strlen("| Player 0 -  │") + strlen(print_name);
+
+            printf("╭"); for (int x = 0; x < print_length - 4; x++) printf("─"); printf("╮\n");
+            printf("│ Player %d - %s │\n", i + 1, print_name);
+            printf("╰"); for (int x = 0; x < print_length - 4; x++) printf("─"); printf("╯\n");
+
+            print_slots(players[i].slot, 0);
+
+            char a;
+            printf("Would you like to (m)ove or (a)ttack?:\n");
+            scanf(" %c", &a);
+
+            if (a == 'a') {
                 attack(players[i]);
+
+                print_slots(players[i].slot, 0);
+            } else if (a == 'm') {
+                int m = move(&players[i]);
+                if (m == 0) {
+                    printf("Player can't move so must attack.\n");
+                    attack(players[i]);
+
+                    print_slots(players[i].slot, 0);
+                } else {
+                    print_slots(players[i].slot, m);
+                }
+            }
+
+            printf("\n\n");
+        }
+
+        printf("End of round %d\n", round);
+
+        for (int i = 0; i < players_count; i++) {
+            printf("%s\n", playerPrintName(players[i]));
+        }
+
+        printf("Press enter to continue...\n");
+        fflush(stdin);
+        while(getchar() != '\n');
+
+        round++;
+    }
+}
+
+void print_slots(int position, int direction_movement_to) {
+    // Row 1
+    printf(position != 0 ? "┌" : "┏");
+    for (int i = 0; i < slots_count; i++) {
+        if (slots[i].player != -1) {
+            Player p = players[slots[i].player];
+
+            char *player_print_name = playerPrintName(p);
+            int player_name_length = strlen(player_print_name);
+
+            for (int j = 0; j < player_name_length + 2; j++) {
+                printf("%s", position != i ? "─" : "━");
+            }
+        } else {
+            printf("%s", position != i ? "─" : "━");
+        }
+        if (i < (slots_count - 1)) {
+            if (position == i) {
+                printf("┱");
+            } else if (position == i + 1) {
+                printf("┲");
+            } else {
+                printf("┬");
             }
         }
     }
+    printf(position != slots_count - 1 ? "┐" : "┓");
+
+    printf("\n");
+
+    // Row 2
+    printf(position != 0 ? "│" : "┃");
+    for (int i = 0; i < slots_count; i++) {
+        if (slots[i].player != -1) {
+            Player p = players[slots[i].player];
+            printf(" %s ", playerPrintName(p));
+        } else {
+            if (i == position - direction_movement_to) {
+                printf(direction_movement_to == -1 ? "←" : "→");
+            } else {
+                printf(" ");
+            }
+        }
+        if (i < (slots_count - 1)) {
+            printf(position == i || position == i + 1 ? "┃" : "│");
+        }
+    }
+    printf(position != slots_count - 1 ? "│" : "┃");
+
+    printf("\n");
+
+    // Row 3
+    printf(position != 0 ? "└" : "┗");
+    for (int i = 0; i < slots_count; i++) {
+        if (slots[i].player != -1) {
+            Player p = players[slots[i].player];
+
+            char *player_print_name = playerPrintName(p);
+            char *slot_type_name = slotTypeName(slots[i].type);
+
+            int player_name_length = strlen(player_print_name);
+            int slot_type_name_length = strlen(slot_type_name);
+
+            int free_space = player_name_length - slot_type_name_length;
+
+            for (int j = 0; j < free_space / 2 + 1; j++) {
+                printf("%s", position != i ? "─" : "━");
+            }
+            printf("%s", slotTypeName(slots[i].type));
+            for (int j = 0; j < (int)((float)free_space / 2 + 0.5) + 1; j++) {
+                printf("%s", position != i ? "─" : "━");
+            }
+        } else {
+            printf("%s", slotTypeLetter(slots[i].type));
+        }
+        if (i < (slots_count - 1)) {
+            if (position == i) {
+                printf("┹");
+            } else if (position == i + 1) {
+                printf("┺");
+            } else {
+                printf("┴");
+            }
+        }
+    }
+    printf(position != slots_count - 1 ? "┘" : "┛");
+
+    printf("\n");
+}
+
+int move(Player *p) {
+    int slot = (*p).slot;
+
+    bool left_empty = (slot > 0) && slots[slot - 1].player == -1;
+    bool right_empty = (slot < slots_count - 1) && slots[slot + 1].player == -1;
+
+    if (!left_empty && !right_empty) {
+        return 0;
+    }
+
+    int direction = 0;
+    if (left_empty && right_empty) {
+        char d;
+        do {
+            printf("Would you like to go (l)eft or (r)ight?:\n");
+            scanf(" %c", &d);
+        } while (d != 'l' && d != 'r');
+
+        if (d == 'l') {
+            direction = -1;
+        } else { // if (d == 'r') {
+            direction = 1;
+        }
+
+    } else if (left_empty) {
+        direction = -1;
+    } else { // if (right_empty) {
+        direction = 1;
+    }
+
+    (*p).slot += direction;
+    slots[(*p).slot].player = slots[slot].player;
+    slots[slot].player = -1;
+
+    return direction;
+}
+
+bool attack(Player p) {
+    int left_player = -1, right_player = -1;
+
+    for (int dist = 1; p.slot - dist > 0 || p.slot + dist < slots_count; dist++) {
+        if (p.slot - dist > 0 && slots[p.slot - dist].player != -1) {
+            left_player = slots[p.slot - dist].player;
+        }
+        if (p.slot + dist < slots_count && slots[p.slot + dist].player != -1) {
+            right_player = slots[p.slot + dist].player;
+        }
+
+        if (left_player != -1 || right_player != -1) {
+            break;
+        }
+    }
+
+    Player *attack_player;
+    if (left_player != -1 && right_player != -1) {
+        char d;
+        do {
+            printf("Would you like to attack (l)eft or (r)ight?:\n");
+            scanf(" %c", &d);
+        } while (d != 'l' && d != 'r');
+
+        if (d == 'l') {
+            attack_player = &players[left_player];
+        } else { //if (d == 'r') {
+            attack_player = &players[right_player];
+        }
+    } else if (left_player != -1) {
+        attack_player = &players[left_player];
+    } else { //if (right_player != -1) {
+        attack_player = &players[right_player];
+    }
+
+    printf("Attacking %s\n", playerPrintName((*attack_player)));
+
+    if (p.strength <= 70) {
+        (*attack_player).life -= 0.5 * (*attack_player).strength;
+    } else {
+        (*attack_player).life -= 0.3 * (*attack_player).strength;
+    }
+
+    if ((*attack_player).life <= 0) {
+        (*attack_player).life = 0;
+        (*attack_player).alive = false;
+        slots[(*attack_player).slot].player = -1;
+        (*attack_player).slot = -1;
+
+        players_alive--;
+        printf("%s killed - RIP\n", playerPrintName((*attack_player)));
+    }
+
+    return true;
 }
 
 /**
@@ -234,87 +497,4 @@ void shuffle(void *array, size_t num, size_t size) {
             swap(array + (i * size), array + (j * size), size);
         }
     }
-}
-
-bool move(Player p) {
-    int slot = p.slot;
-
-    bool left_empty = (slot > 0) && slots[slot - 1].player == -1;
-    bool right_empty = (slot < slots_count - 1) && slots[slot + 1].player == -1;
-
-    if (!left_empty && !right_empty) {
-        return false;
-    }
-
-    int direction = 0;
-    if (left_empty && right_empty) {
-        char d;
-        do {
-            printf("Would you like to go (l)eft or (r)ight?: ");
-            scanf("%c", &d);
-        } while (d != 'l' && d != 'r');
-
-        if (d == 'l') {
-            direction = -1;
-        } else if (d == 'r') {
-            direction = 1;
-        }
-
-    } else if (left_empty) {
-        direction = -1;
-    } else if (right_empty) {
-        direction = 1;
-    }
-
-    p.slot += direction;
-    slots[p.slot].player = slots[slot].player;
-    slots[slot].player = -1;
-
-    return true;
-}
-
-bool attack(Player p) {
-    int left_player = -1, right_player = -1;
-
-    for (int dist = 1; p.slot - dist > 0 || p.slot + dist < slots_count; dist++) {
-        if (p.slot - dist > 0 && slots[p.slot - dist].player != -1) {
-            left_player = slots[p.slot - dist].player;
-        }
-        if (p.slot + dist < slots_count && slots[p.slot + dist].player != -1) {
-            right_player = slots[p.slot + dist].player;
-        }
-
-        if (left_player != -1 || right_player != -1) {
-            break;
-        }
-    }
-
-    Player attack_player;
-    if (left_player != -1 && right_player != -1) {
-        char d;
-        do {
-            printf("Would you like to attack (l)eft or (r)ight?: ");
-            scanf("%c", &d);
-        } while (d != 'l' && d != 'r');
-
-        if (d == 'l') {
-            attack_player = players[left_player];
-        } else if (d == 'r') {
-            attack_player = players[right_player];
-        }
-    } else if (left_player != -1) {
-        attack_player = players[left_player];
-    } else if (right_player != -1) {
-        attack_player = players[right_player];
-    } else {
-        return false;
-    }
-
-    if (p.strength <= 70) {
-        attack_player.life -= 0.5 * attack_player.strength;
-    } else {
-        attack_player.life -= 0.3 * attack_player.strength;
-    }
-
-    return true;
 }
