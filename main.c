@@ -101,46 +101,66 @@ int main(void) {
 
     printf("Welcome to CrossFire!!\n");
 
-    printf("Enter number of players(max = 6):\n");
-    //scanf("%u", &players_count);
-    players_count = 4;
+    bool demo_mode;
+    char d;
+    do {
+        printf("Would you like to use (d)emo mode or (r)egular mode?:\n");
+        scanf(" %c", &d);
+    } while (d != 'd' && d != 'r');
+
+    demo_mode = d == 'd';
+
+    if (!demo_mode) {
+        printf("Enter number of players(max = 6):\n");
+        scanf("%u", &players_count);
+    } else {
+        players_count = 4;
+    }
 
     players = (Player *) malloc(sizeof(Player) * players_count);
 
-    printf("Player types: (E)lf, (H)uman, (O)gre, (W)izard\n");
 
-    char *names[] = {"John Sheekey", "Mark Dukes", "Henry McLoughlin", "Liliana Pasquale"};
-    char types[] = {'h', 'o', 'w', 'e'};
+    if (!demo_mode) {
+        printf("Player types: (e)lf, (h)uman, (o)gre, (w)izard\n");
+        int players_index = 0;
+        while (players_index < players_count) {
+            char *name = (char *) malloc(32 * sizeof(char));
+            char t;
+            printf("Enter type and player name:\n");
+            scanf(" %c %[^\n]", &t, name);
 
-    int players_index = 0;
-    while (players_index < players_count) {
-        char *name = (char *) malloc(32 * sizeof(char));
-        char t;
-        printf("Enter type and player name:\n");
-        //scanf(" %c %[^\n]", &t, name);
-        t = types[players_index];
-        name = names[players_index];
+            PlayerType type;
 
-        PlayerType type;
+            if (t == 'e') {
+                type = Elf;
+            } else if (t == 'h') {
+                type = Human;
+            } else if (t == 'o') {
+                type = Ogre;
+            } else if (t == 'w') {
+                type = Wizard;
+            } else {
+                printf("Invalid type.\n");
+                continue;
+            }
 
-        if (t == 'e') {
-            type = Elf;
-        } else if (t == 'h') {
-            type = Human;
-        } else if (t == 'o') {
-            type = Ogre;
-        } else if (t == 'w') {
-            type = Wizard;
-        } else {
-            printf("Invalid type.\n");
-            continue;
+            Player p;
+            p.type = type;
+            p.name = name;
+
+            players[players_index++] = p;
         }
+    } else {
+        char *demo_names[] = {"John Sheekey", "Mark Dukes", "Henry McLoughlin", "Liliana Pasquale"};
+        PlayerType demo_types[] = {Human, Ogre, Wizard, Elf};
 
-        Player p;
-        p.type = type;
-        p.name = name;
+        for (int i = 0; i < players_count; i++) {
+            Player p;
+            p.type = demo_types[i];
+            p.name = demo_names[i];
 
-        players[players_index++] = p;
+            players[i] = p;
+        }
     }
 
     for (int i = 0; i < players_count; i++) {
@@ -182,8 +202,12 @@ int main(void) {
         }
     }
 
-    printf("Enter number of slots(max = 20): \n");
-    //scanf("%d", &slots_count);
+    if (!demo_mode) {
+        printf("Enter number of slots(max = 20): \n");
+        scanf("%d", &slots_count);
+    } else {
+        slots_count = 12;
+    }
 
     slots = (Slot *) malloc(sizeof(Slot) * slots_count);
 
