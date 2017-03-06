@@ -97,7 +97,7 @@ Slot *slots;
 size_t slots_count = 20;
 
 int main(void) {
-    srand(time(NULL));
+    srand((unsigned int) time(NULL));
 
     printf("Welcome to CrossFire!!\n");
 
