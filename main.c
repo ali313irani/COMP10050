@@ -38,7 +38,7 @@ unsigned int rand_range(int min, int max);
 void shuffle(void *array, size_t num, size_t size);
 
 int move(Player *p);
-bool attack(Player p);
+bool attack(Player *p);
 
 void print_slots(int position, int direction_movement_from);
 
@@ -301,14 +301,14 @@ int main(void) {
 
             int m = 0;
             if (a == 'a') {
-                attack(players[i]);
+                attack(&players[i]);
             } else { // if (a == 'm') {
                 m = move(&players[i]);
 
                 // If the player was unable to move, force attack
                 if (m == 0) {
                     printf("Player can't move so must attack.\n");
-                    attack(players[i]);
+                    attack(&players[i]);
                 }
             }
 
@@ -475,17 +475,26 @@ void print_slots(int position, int direction_movement_to) {
     printf("\n");
 }
 
+/**
+ * Move player
+ *
+ * @param p Pointer to player struct
+ * @return Direction moved, or 0 if unable to move
+ */
 int move(Player *p) {
-    int slot = (*p).slot;
+    int slot = p->slot;
 
+    // Check whether the slots to the left and right are free
     bool left_empty = (slot > 0) && slots[slot - 1].player == -1;
     bool right_empty = (slot < slots_count - 1) && slots[slot + 1].player == -1;
 
+    // Neither slot is free, unable to move
     if (!left_empty && !right_empty) {
         return 0;
     }
 
     int direction = 0;
+    // If both sides are free, ask user where to go
     if (left_empty && right_empty) {
         char d;
         do {
@@ -498,29 +507,29 @@ int move(Player *p) {
         } else { // if (d == 'r') {
             direction = 1;
         }
-
     } else if (left_empty) {
         direction = -1;
     } else { // if (right_empty) {
         direction = 1;
     }
 
-    (*p).slot += direction;
-    slots[(*p).slot].player = slots[slot].player;
+    // Move player and update slots
+    p->slot += direction;
+    slots[p->slot].player = slots[slot].player;
     slots[slot].player = -1;
 
     return direction;
 }
 
-bool attack(Player p) {
+bool attack(Player *p) {
     int left_player = -1, right_player = -1;
 
-    for (int dist = 1; p.slot - dist > 0 || p.slot + dist < slots_count; dist++) {
-        if (p.slot - dist > 0 && slots[p.slot - dist].player != -1) {
-            left_player = slots[p.slot - dist].player;
+    for (int dist = 1; p->slot - dist > 0 || p->slot + dist < slots_count; dist++) {
+        if (p->slot - dist > 0 && slots[p->slot - dist].player != -1) {
+            left_player = slots[p->slot - dist].player;
         }
-        if (p.slot + dist < slots_count && slots[p.slot + dist].player != -1) {
-            right_player = slots[p.slot + dist].player;
+        if (p->slot + dist < slots_count && slots[p->slot + dist].player != -1) {
+            right_player = slots[p->slot + dist].player;
         }
 
         if (left_player != -1 || right_player != -1) {
@@ -549,17 +558,17 @@ bool attack(Player p) {
 
     printf("Attacking %s\n", playerPrintName((*attack_player)));
 
-    if ((*attack_player).strength <= 70) {
-        (*attack_player).life -= 0.5 * (*attack_player).strength;
+    if (attack_player->strength <= 70) {
+        attack_player->life -= 0.5 * attack_player->strength;
     } else {
-        (*attack_player).life -= 0.3 * (*attack_player).strength;
+        attack_player->life -= 0.3 * attack_player->strength;
     }
 
-    if ((*attack_player).life <= 0) {
-        (*attack_player).life = 0;
-        (*attack_player).alive = false;
-        slots[(*attack_player).slot].player = -1;
-        (*attack_player).slot = -1;
+    if (attack_player->life <= 0) {
+        attack_player->life = 0;
+        attack_player->alive = false;
+        slots[attack_player->slot].player = -1;
+        attack_player->slot = -1;
 
         players_alive--;
         printf("%s killed - RIP\n", playerPrintName((*attack_player)));
