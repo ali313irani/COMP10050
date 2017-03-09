@@ -342,6 +342,13 @@ int main(void) {
 
         round++;
     }
+	
+	for (int i = 0; i < players_count; i++) {
+		
+		if(players[i].alive == true){
+			printf("\n player %s has won\n", playerPrintName(players[i]));
+		}
+	}
 }
 
 /**
