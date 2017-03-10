@@ -37,6 +37,8 @@ unsigned int rand_range(int min, int max);
 
 void shuffle(void *array, size_t num, size_t size);
 
+void await_input();
+
 int move(Player *p);
 void attack(Player *p);
 
@@ -281,6 +283,21 @@ int main(void) {
     // Continue main program loop as long as there is more than 1 player alive
     int round = 1;
     while (players_alive > 1) {
+        printf("┏━━━━━━━━━━━━━━┱"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┬" : "┐"); printf("\n");
+        printf("┃ %-12s ┃", "Player #"); for (int i = 0; i < players_count; i++) printf(" %-18d │", i + 1); printf("\n");
+        printf("┣━━━━━━━━━━━━━━╉"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┼" : "┤"); printf("\n");
+        printf("┃ %-12s ┃", "Name"); for (int i = 0; i < players_count; i++) printf(" %-18s │", players[i].name); printf("\n");
+        printf("┃ %-12s ┃", "Type"); for (int i = 0; i < players_count; i++) printf(" %-18s │", playerTypeName(players[i].type)); printf("\n");
+        printf("┃ %-12s ┃", "Slot"); for (int i = 0; i < players_count; i++) if (players[i].slot >= 0) printf(" #%02d %-14s │", players[i].slot + 1, slotTypeName(slots[players[i].slot].type)); else printf(" %-18s │", "Dead"); printf("\n");
+        printf("┃ %-12s ┃", "Health"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].life); printf("\n");
+        printf("┃ %-12s ┃", "Strength"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].strength); printf("\n");
+        printf("┃ %-12s ┃", "Dexterity"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].dexterity); printf("\n");
+        printf("┃ %-12s ┃", "Luck"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].luck); printf("\n");
+        printf("┃ %-12s ┃", "Magic"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].magic); printf("\n");
+        printf("┃ %-12s ┃", "Smartness"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].smartness); printf("\n");
+        printf("┗━━━━━━━━━━━━━━┹"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┴" : "┘"); printf("\n");
+
+
         printf("╔══════════╗\n");
         printf("║ Round %2d ║\n", round);
         printf("╚══════════╝\n");
@@ -333,9 +350,7 @@ int main(void) {
             printf("%s\n", playerPrintName(players[i]));
         }
 
-        printf("Press enter to continue...\n");
-        fflush(stdin);
-        while(getchar() != '\n');
+        await_input();
 
         // Clear screen for next round
         system("cls");
@@ -349,6 +364,12 @@ int main(void) {
 			printf("\n player %s has won\n", playerPrintName(players[i]));
 		}
 	}
+}
+
+void await_input() {
+    printf("Press enter to continue...\n");
+    fflush(stdin);
+    while(getchar() != '\n');
 }
 
 /**
@@ -538,7 +559,7 @@ int move(Player *p) {
 }
 
 /**
- * attack player
+ * Attack player
  *
  * @param p Pointer to player struct
  * @return Direction moved, or 0 if unable to move
