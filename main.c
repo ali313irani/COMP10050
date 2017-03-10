@@ -352,16 +352,18 @@ int main(void) {
 
         await_input();
 
-        // Clear screen for next round
-        system("cls");
+        if (players_alive > 1) {
+            // Clear screen for next round
+            system("cls");
+        }
 
         round++;
     }
 	
 	for (int i = 0; i < players_count; i++) {
-		
-		if(players[i].alive == true){
-			printf("\n player %s has won\n", playerPrintName(players[i]));
+		if (players[i].alive == true) {
+			printf("%s has won after %d rounds!\n", playerPrintName(players[i]), round);
+            break;
 		}
 	}
 }
@@ -583,7 +585,6 @@ void attack(Player *p) {
             break;
         }
     }
-
 
 
     Player *target_player;
