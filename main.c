@@ -5,44 +5,7 @@
 #include <time.h>
 #include <windows.h>
 
-typedef enum SlotType {
-    Ground, City, Hill
-} SlotType;
-
-typedef struct Slot {
-    SlotType type;
-    int player;
-} Slot;
-
-typedef enum PlayerType {
-    Elf, Human, Ogre, Wizard
-} PlayerType;
-
-typedef struct Player {
-    char *name;
-    enum PlayerType type;
-    int slot;
-    bool alive;
-    int life;
-    int smartness;
-    int strength;
-    int magic;
-    int luck;
-    int dexterity;
-} Player;
-
-void swap(void *a, void *b, size_t size);
-
-unsigned int rand_range(int min, int max);
-
-void shuffle(void *array, size_t num, size_t size);
-
-void await_input();
-
-int move(Player *p);
-void attack(Player *p);
-
-void print_slots(int position, int direction_movement_from);
+#include "main.h"
 
 char *slotTypeName(SlotType s) {
     switch (s) {
@@ -287,19 +250,7 @@ int main(void) {
         printf("║ Round %2d ║\n", round);
         printf("╚══════════╝\n");
 
-        printf("┏━━━━━━━━━━━━━━┱"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┬" : "┐"); printf("\n");
-        printf("┃ %-12s ┃", "Player #"); for (int i = 0; i < players_count; i++) printf(" %-18d │", i + 1); printf("\n");
-        printf("┣━━━━━━━━━━━━━━╉"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┼" : "┤"); printf("\n");
-        printf("┃ %-12s ┃", "Name"); for (int i = 0; i < players_count; i++) printf(" %-18s │", players[i].name); printf("\n");
-        printf("┃ %-12s ┃", "Type"); for (int i = 0; i < players_count; i++) printf(" %-18s │", playerTypeName(players[i].type)); printf("\n");
-        printf("┃ %-12s ┃", "Slot"); for (int i = 0; i < players_count; i++) if (players[i].slot >= 0) printf(" #%02d %-14s │", players[i].slot + 1, slotTypeName(slots[players[i].slot].type)); else printf(" %-18s │", "Dead"); printf("\n");
-        printf("┃ %-12s ┃", "Health"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].life); printf("\n");
-        printf("┃ %-12s ┃", "Strength"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].strength); printf("\n");
-        printf("┃ %-12s ┃", "Dexterity"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].dexterity); printf("\n");
-        printf("┃ %-12s ┃", "Luck"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].luck); printf("\n");
-        printf("┃ %-12s ┃", "Magic"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].magic); printf("\n");
-        printf("┃ %-12s ┃", "Smartness"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].smartness); printf("\n");
-        printf("┗━━━━━━━━━━━━━━┹"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┴" : "┘"); printf("\n");
+        print_players();
 
         // Loop through each player
         for (int i = 0; i < players_count; i++) {
@@ -345,9 +296,7 @@ int main(void) {
 
         // End of round standings
         printf("End of round %d\n", round);
-        for (int i = 0; i < players_count; i++) {
-            printf("%s\n", playerPrintName(players[i]));
-        }
+        print_players();
 
         await_input();
 
@@ -358,7 +307,8 @@ int main(void) {
 
         round++;
     }
-	
+
+    // Find winning player
 	for (int i = 0; i < players_count; i++) {
 		if (players[i].alive == true) {
 			printf("%s has won after %d rounds!\n", playerPrintName(players[i]), round);
@@ -371,6 +321,25 @@ void await_input() {
     printf("Press enter to continue...\n");
     fflush(stdin);
     while(getchar() != '\n');
+}
+
+/**
+ * Prints players information
+ */
+void print_players() {
+    printf("┏━━━━━━━━━━━━━━┱"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┬" : "┐"); printf("\n");
+    printf("┃ %-12s ┃", "Player #"); for (int i = 0; i < players_count; i++) printf(" %-18d │", i + 1); printf("\n");
+    printf("┣━━━━━━━━━━━━━━╉"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┼" : "┤"); printf("\n");
+    printf("┃ %-12s ┃", "Name"); for (int i = 0; i < players_count; i++) printf(" %-18s │", players[i].name); printf("\n");
+    printf("┃ %-12s ┃", "Type"); for (int i = 0; i < players_count; i++) printf(" %-18s │", playerTypeName(players[i].type)); printf("\n");
+    printf("┃ %-12s ┃", "Slot"); for (int i = 0; i < players_count; i++) if (players[i].slot >= 0) printf(" #%02d %-14s │", players[i].slot + 1, slotTypeName(slots[players[i].slot].type)); else printf(" %-18s │", "Dead"); printf("\n");
+    printf("┃ %-12s ┃", "Health"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].life); printf("\n");
+    printf("┃ %-12s ┃", "Strength"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].strength); printf("\n");
+    printf("┃ %-12s ┃", "Dexterity"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].dexterity); printf("\n");
+    printf("┃ %-12s ┃", "Luck"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].luck); printf("\n");
+    printf("┃ %-12s ┃", "Magic"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].magic); printf("\n");
+    printf("┃ %-12s ┃", "Smartness"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].smartness); printf("\n");
+    printf("┗━━━━━━━━━━━━━━┹"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┴" : "┘"); printf("\n");
 }
 
 /**
