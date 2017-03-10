@@ -519,13 +519,42 @@ int move(Player *p) {
     } else { // if (right_empty) {
         direction = 1;
     }
+	
 
     // Move player and update slots
     p->slot += direction;
     slots[p->slot].player = slots[slot].player;
     slots[slot].player = -1;
-
-    return direction;
+	
+	
+	if(slots[slot].type == Hill ){
+		for(int i = 0; i < players_count; i++){
+				if(players[i].dexterity < 50){
+					players[i].strength = players[i].strength - 10;
+				}
+				else if(players[i].dexterity >= 60){
+					players[i].strength = players[i].strength + 10;
+					break;
+				}
+			}
+	}
+	else if(slots[slot].type == City){
+		for(int i = 0; i < players_count; i++){
+				if(players[i].smartness > 60){
+					players[i].magic = players[i].magic + 10;
+				}
+				else if(players[i].smartness <= 50){
+					players[i].dexterity = players[i].dexterity - 10;
+					break;
+				}
+			}
+	}
+	
+	
+	
+	return direction;
+	
+	
 }
 
 /**
