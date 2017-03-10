@@ -527,13 +527,13 @@ int move(Player *p) {
     slots[slot].player = -1;
 
 
-    if (slots[slot].type == Hill) {
+    if (slots[p->slot].type == Hill) {
         if (p->dexterity < 50) {
             p->strength -= 10;
         } else if (p->dexterity >= 60) {
             p->strength += 10;
         }
-    } else if (slots[slot].type == City) {
+    } else if (slots[p->slot].type == City) {
         if (p->smartness > 60) {
             p->magic += 10;
         } else if (p->smartness <= 50) {
