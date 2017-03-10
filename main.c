@@ -283,6 +283,10 @@ int main(void) {
     // Continue main program loop as long as there is more than 1 player alive
     int round = 1;
     while (players_alive > 1) {
+        printf("╔══════════╗\n");
+        printf("║ Round %2d ║\n", round);
+        printf("╚══════════╝\n");
+
         printf("┏━━━━━━━━━━━━━━┱"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┬" : "┐"); printf("\n");
         printf("┃ %-12s ┃", "Player #"); for (int i = 0; i < players_count; i++) printf(" %-18d │", i + 1); printf("\n");
         printf("┣━━━━━━━━━━━━━━╉"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┼" : "┤"); printf("\n");
@@ -296,11 +300,6 @@ int main(void) {
         printf("┃ %-12s ┃", "Magic"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].magic); printf("\n");
         printf("┃ %-12s ┃", "Smartness"); for (int i = 0; i < players_count; i++) printf(" %-18d │", players[i].smartness); printf("\n");
         printf("┗━━━━━━━━━━━━━━┹"); for (int i = 0; i < players_count; i++) printf("────────────────────%s", i < players_count - 1 ? "┴" : "┘"); printf("\n");
-
-
-        printf("╔══════════╗\n");
-        printf("║ Round %2d ║\n", round);
-        printf("╚══════════╝\n");
 
         // Loop through each player
         for (int i = 0; i < players_count; i++) {
