@@ -586,7 +586,7 @@ void attack(Player *p) {
 
 
 
-    Player *attack_player;
+    Player *target_player;
     if (left_player != -1 && right_player != -1) {
         char d;
         do {
@@ -595,36 +595,40 @@ void attack(Player *p) {
         } while (d != 'l' && d != 'r');
 
         if (d == 'l') {
-            attack_player = &players[left_player];
+            target_player = &players[left_player];
         } else { //if (d == 'r') {
-            attack_player = &players[right_player];
+            target_player = &players[right_player];
         }
     } else if (left_player != -1) {
-        attack_player = &players[left_player];
+        target_player = &players[left_player];
     } else if (right_player != -1) {
-        attack_player = &players[right_player];
+        target_player = &players[right_player];
     } else {
         // Shouldn't happen that no player was found, but return anyway to avoid error
         return;
     }
 
+    Player *damaged_player;
+
     // Attack player
-    printf("Attacking %s\n", playerPrintName((*attack_player)));
-    if (attack_player->strength <= 70) {
-        attack_player->life -= 0.5 * attack_player->strength;
+    printf("Attacking %s\n", playerPrintName((*target_player)));
+    if (target_player->strength <= 70) {
+        target_player->life -= 0.5 * p->strength;
+        damaged_player = target_player;
     } else {
-        attack_player->life -= 0.3 * attack_player->strength;
+        p->life -= 0.3 * target_player->strength;
+        damaged_player = p;
     }
 
     // If player has lost all health they are no longer alive
-    if (attack_player->life <= 0) {
-        attack_player->life = 0;
-        attack_player->alive = false;
-        slots[attack_player->slot].player = -1;
-        attack_player->slot = -1;
+    if (damaged_player->life <= 0) {
+        damaged_player->life = 0;
+        damaged_player->alive = false;
+        slots[damaged_player->slot].player = -1;
+        damaged_player->slot = -1;
 
         players_alive--;
-        printf("%s killed - RIP\n", playerPrintName((*attack_player)));
+        printf("%s killed - RIP\n", playerPrintName((*damaged_player)));
     }
 }
 
