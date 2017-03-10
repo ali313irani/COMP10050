@@ -310,10 +310,10 @@ int main(void) {
 
             // Print player name in rounded box
             char *print_name = playerPrintName(p);
-            int print_length = strlen("| Player 0 -  │") + strlen(print_name);
-            printf("╭"); for (int x = 0; x < print_length - 4; x++) printf("─"); printf("╮\n");
-            printf("│ Player %d - %s │\n", i + 1, print_name);
-            printf("╰"); for (int x = 0; x < print_length - 4; x++) printf("─"); printf("╯\n");
+            int print_length = strlen(print_name) + 2;
+            printf("╭──────────┬"); for (int x = 0; x < print_length; x++) printf("─"); printf("╮\n");
+            printf("│ Player %d │ %s │\n", i + 1, print_name);
+            printf("╰──────────┴"); for (int x = 0; x < print_length; x++) printf("─"); printf("╯\n");
 
             // Print current slots
             print_slots(players[i].slot, 0);
