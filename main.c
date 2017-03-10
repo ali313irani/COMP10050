@@ -525,30 +525,21 @@ int move(Player *p) {
     p->slot += direction;
     slots[p->slot].player = slots[slot].player;
     slots[slot].player = -1;
-	
-	
-	if(slots[slot].type == Hill ){
-		for(int i = 0; i < players_count; i++){
-				if(players[i].dexterity < 50){
-					players[i].strength = players[i].strength - 10;
-				}
-				else if(players[i].dexterity >= 60){
-					players[i].strength = players[i].strength + 10;
-					break;
-				}
-			}
-	}
-	else if(slots[slot].type == City){
-		for(int i = 0; i < players_count; i++){
-				if(players[i].smartness > 60){
-					players[i].magic = players[i].magic + 10;
-				}
-				else if(players[i].smartness <= 50){
-					players[i].dexterity = players[i].dexterity - 10;
-					break;
-				}
-			}
-	}
+
+
+    if (slots[slot].type == Hill) {
+        if (p->dexterity < 50) {
+            p->strength -= 10;
+        } else if (p->dexterity >= 60) {
+            p->strength += 10;
+        }
+    } else if (slots[slot].type == City) {
+        if (p->smartness > 60) {
+            p->magic += 10;
+        } else if (p->smartness <= 50) {
+            p->dexterity -= 10;
+        }
+    }
 	
 	
 	
