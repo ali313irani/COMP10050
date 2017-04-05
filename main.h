@@ -27,12 +27,6 @@ typedef struct Player {
     int dexterity;
 } Player;
 
-void swap(void *a, void *b, size_t size);
-
-unsigned int rand_range(int min, int max);
-
-void shuffle(void *array, size_t num, size_t size);
-
 void await_input();
 
 int move(Player *p);
